@@ -1,29 +1,52 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.addEventListener('click', function() {
-            alert('Button clicked!');
-        });
+    const searchButton = document.getElementById('searchButton');
+    const mealSearch = document.getElementById('mealSearch');
+    const itemsContainer = document.getElementById('items');
+    const msg = document.getElementById('msg');
+
+    searchButton.addEventListener('click', function() {
+        const query = mealSearch.value.trim();
+        if (query) {
+            fetchRecipes(query);
+        }
     });
-});
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('falling-vegetables');
-    const vegetables = ['kelp.png', 'carrots.png', 'corn.png']; // Add your specific vegetable images here
 
-    function createVegetable() {
-        const vegetable = document.createElement('img');
-        vegetable.src = `images/${vegetables[Math.floor(Math.random() * vegetables.length)]}`;
-        vegetable.classList.add('vegetable');
-        vegetable.style.left = `${Math.random() * 100}vw`;
-        vegetable.style.animationDuration = `${Math.random() * 9 + 7}s`; // Random duration between 5 and 10 seconds
-        container.appendChild(vegetable);
+    function fetchRecipes(query) {
+        const apiUrl = `https://api.api-ninjas.com/v1/recipe?query=${query}`;
 
-        // Remove the vegetable after the animation ends
-        vegetable.addEventListener('animationend', () => {
-            vegetable.remove();
+        fetch(apiUrl, {
+            headers: {
+                'X-Api-Key': '1epqI0NA2HdDQWAra/4JLA==62DNt8CYULG0YCYc', // Your API key
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            displayRecipes(data);
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
         });
     }
 
-    // Create a new vegetable every ___ms
-    setInterval(createVegetable, 1000);
+    function displayRecipes(recipes) {
+        itemsContainer.innerHTML = ''; // Clear previous results
+        msg.style.display = recipes.length ? 'none' : 'block'; // Show message if no recipes
+
+        recipes.forEach(recipe => {
+            const recipeDiv = document.createElement('div');
+            recipeDiv.className = 'recipe';
+            recipeDiv.innerHTML = `
+                <h4>${recipe.title}</h4>
+                <p>${recipe.instructions}</p>
+                <p><strong>Ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
+            `;
+            itemsContainer.appendChild(recipeDiv);
+        });
+    }
 });
