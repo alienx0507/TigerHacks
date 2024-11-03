@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function fetchRecipes(query) {
-        const apiUrl = `https://api.api-ninjas.com/v1/recipe?query=${query}`;
+        const apiUrl = `https://api.api-ninjas.com/v1/recipe?query=soup&ingredients=${query}`;
 
         fetch(apiUrl, {
             headers: {
